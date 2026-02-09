@@ -10,7 +10,7 @@ export const UserLayout = ({ children }: Props) => {
     return (
         <SidebarProvider>
             <UserAppSidebar />
-            <main>
+            <main className="w-full">
                 <SidebarTrigger />
                 {children}
             </main>
