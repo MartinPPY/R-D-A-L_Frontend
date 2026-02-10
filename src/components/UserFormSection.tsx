@@ -9,6 +9,9 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { useEffect, useState } from "react"
 import { getAreas } from "@/services/areaService"
 import { Controller, useForm } from "react-hook-form"
+import { createActivity, getActivities } from "@/services/actividadService"
+import { Spinner } from "./ui/spinner"
+import { toast } from "sonner"
 
 interface Area {
     id: number;
@@ -22,10 +25,29 @@ interface FormValues {
     area: string;
 }
 
-export const UserFormSection = () => {
+interface RequestBody {
+    fecha: string,
+    hora_inicio: string,
+    hora_fin: string,
+    area_id: number
+}
+
+interface Activity {
+    id: number;
+    fecha: string;
+    hora_inicio: string;
+    hora_fin: string;
+    area: {
+        id: number,
+        name: string
+    };
+}
+
+export const UserFormSection = ({setActividades}: {setActividades: React.Dispatch<React.SetStateAction<Activity[]>>}) => {
 
     const [areas, setAreas] = useState<Area[]>([])
-    const { register, handleSubmit, formState: { errors }, control } = useForm<FormValues>({
+    const [loading, setLoading] = useState(false)
+    const { register, handleSubmit, formState: { errors }, control, reset } = useForm<FormValues>({
         defaultValues: {
             date: new Date(),
             startTime: "",
@@ -47,7 +69,32 @@ export const UserFormSection = () => {
     }, [])
 
     const onSubmit = async (data: FormValues) => {
-        console.log(data)
+        
+        const dateObj = new Date(data.date)
+        const fecha = dateObj.getFullYear() + "-" + "0" + (dateObj.getMonth() + 1) + "-" + "0" + dateObj.getDate()
+
+        const body: RequestBody = {
+            fecha: fecha,
+            hora_inicio: data.startTime,
+            hora_fin: data.endTime,
+            area_id: parseInt(data.area)
+        }
+
+        try {
+            setLoading(true)
+            await createActivity(body)
+            toast("Actividad registrada exitosamente")
+
+            const response = await getActivities()
+            setActividades(response)
+
+        } catch (error) {
+            console.log(error)
+            toast("Error al registrar actividad")
+        } finally {
+            setLoading(false)
+            reset()
+        }
     }
 
     return (
@@ -64,7 +111,7 @@ export const UserFormSection = () => {
                             <Controller
                                 name="date"
                                 control={control}
-                                rules={{required:"La fecha es obligatoria!"}}
+                                rules={{ required: "La fecha es obligatoria!" }}
                                 render={({ field }) => (
                                     <Popover>
                                         <PopoverTrigger asChild>
@@ -99,12 +146,12 @@ export const UserFormSection = () => {
                         <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                             <div className="flex flex-col gap-2">
                                 <Label>Hora de inicio: </Label>
-                                <Input type="time" {...register("startTime",{required: "La hora de inicio es requerida"})} />
+                                <Input type="time" {...register("startTime", { required: "La hora de inicio es requerida" })} />
                                 {errors.startTime && <p className="text-red-500">{errors.startTime.message}</p>}
                             </div>
                             <div className="flex flex-col gap-2">
                                 <Label>Hora de fin: </Label>
-                                <Input type="time" {...register("endTime",{required: "La hora de fin es requerida"})} />
+                                <Input type="time" {...register("endTime", { required: "La hora de fin es requerida" })} />
                                 {errors.endTime && <p className="text-red-500">{errors.endTime.message}</p>}
                             </div>
                         </div>
@@ -114,7 +161,7 @@ export const UserFormSection = () => {
                             <Controller
                                 name="area"
                                 control={control}
-                                rules={{required: "El área de trabajo es requerida"}}
+                                rules={{ required: "El área de trabajo es requerida" }}
                                 render={({ field }) => (
                                     <Select
                                         onValueChange={field.onChange}
@@ -127,7 +174,7 @@ export const UserFormSection = () => {
                                         <SelectContent>
                                             <SelectGroup>
                                                 {areas.map((area, index) => (
-                                                    <SelectItem key={index} value={area.name}>
+                                                    <SelectItem key={index} value={area.id.toString()}>
                                                         {area.name}
                                                     </SelectItem>
                                                 ))}
@@ -140,7 +187,9 @@ export const UserFormSection = () => {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button>Registrar</Button>
+                        <Button type="submit" disabled={loading}>
+                            {loading ? <> <Spinner /> Registrando... </> : "Registrar"}
+                        </Button>
                     </CardFooter>
                 </Card>
             </form>
