@@ -12,6 +12,7 @@ import { Controller, useForm } from "react-hook-form"
 import { createActivity, getActivities } from "@/services/actividadService"
 import { Spinner } from "./ui/spinner"
 import { toast } from "sonner"
+import { getResumenMensualAlumno } from "@/services/resumenService"
 
 interface Area {
     id: number;
@@ -43,7 +44,20 @@ interface Activity {
     };
 }
 
-export const UserFormSection = ({setActividades}: {setActividades: React.Dispatch<React.SetStateAction<Activity[]>>}) => {
+interface ResumenMensual{
+  horas_acumuladas:number;
+  total_acumulado:number;
+  horas_aprobadas:number;
+}
+
+interface Props{
+    setActividades: React.Dispatch<React.SetStateAction<Activity[]>>;
+    setResumenMensual: React.Dispatch<React.SetStateAction<ResumenMensual>>;
+}
+
+export const UserFormSection = (
+    { setActividades, setResumenMensual }: Props
+) => {
 
     const [areas, setAreas] = useState<Area[]>([])
     const [loading, setLoading] = useState(false)
@@ -69,9 +83,9 @@ export const UserFormSection = ({setActividades}: {setActividades: React.Dispatc
     }, [])
 
     const onSubmit = async (data: FormValues) => {
-        
+
         const dateObj = new Date(data.date)
-        const fecha = dateObj.getFullYear() + "-" + "0" + (dateObj.getMonth() + 1) + "-" + "0" + dateObj.getDate()
+        const fecha = dateObj.getFullYear() + "-" + "0" + (dateObj.getMonth() + 1) + "-" + (dateObj.getDate().toString().length === 1 ? "0" + dateObj.getDate() : dateObj.getDate())
 
         const body: RequestBody = {
             fecha: fecha,
@@ -87,10 +101,14 @@ export const UserFormSection = ({setActividades}: {setActividades: React.Dispatc
 
             const response = await getActivities()
             setActividades(response)
+            const resResumenMensual = await getResumenMensualAlumno()
+            setResumenMensual(resResumenMensual)
 
-        } catch (error) {
-            console.log(error)
-            toast("Error al registrar actividad")
+        } catch (error: any) {
+            console.log(error.response)
+            toast("Error al registrar actividad", {
+                position: "top-right"
+            })
         } finally {
             setLoading(false)
             reset()

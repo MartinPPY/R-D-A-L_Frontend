@@ -3,6 +3,7 @@ import { UserFormSection } from "@/components/UserFormSection"
 import { UserTable } from "@/components/UserTable"
 import { UserLayout } from "@/layouts/UserLayout"
 import { getActivities } from "@/services/actividadService"
+import { getResumenMensualAlumno } from "@/services/resumenService"
 import { useEffect, useState } from "react"
 
 interface Activity {
@@ -16,27 +17,45 @@ interface Activity {
   };
 }
 
+interface ResumenMensual{
+  horas_acumuladas:number;
+  total_acumulado:number;
+  horas_aprobadas:number;
+}
+
 
 export const Home = () => {
 
   const [actividades, setActividades] = useState<Activity[]>([])
+  const [resumen,setResumenMensual] = useState<ResumenMensual>({
+    horas_acumuladas: 0,
+    total_acumulado: 0,
+    horas_aprobadas: 0
+  })
 
   useEffect(() => {
 
-    const fetchActivities = async()=>{
+    const fetchActivities = async () => {
       const response = await getActivities()
       setActividades(response)
     }
-    fetchActivities()
 
-  },[])
+    const fetchResumen = async () => {
+      const response = await getResumenMensualAlumno()
+      setResumenMensual(response)
+    }
+
+    fetchActivities()
+    fetchResumen()
+
+  }, [])
 
   return (
     <UserLayout>
       <div className="flex flex-col gap-20 p-4">
-        <UserCardsSection />
-        <UserFormSection setActividades={setActividades} />
-        <UserTable actividades={actividades}/>
+        <UserCardsSection resumen={resumen} />
+        <UserFormSection setActividades={setActividades}  setResumenMensual={setResumenMensual} />    
+        <UserTable actividades={actividades} />
       </div>
     </UserLayout>
   )
