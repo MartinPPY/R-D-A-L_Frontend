@@ -1,8 +1,17 @@
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "./ui/sidebar"
 import { DropdownMenuTrigger, DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuGroup, DropdownMenuItem } from "./ui/dropdown-menu"
 import { EllipsisIcon, LogOut, User } from "lucide-react"
+import { logout } from "@/services/authService"
+import { useNavigate } from "react-router-dom"
 
 export const UserSidebarFooter = () => {
+
+    const navigate = useNavigate()
+
+    const handleLogout = async()=>{
+        await logout()
+        navigate("/login")
+    }
 
     const { isMobile } = useSidebar()
 
@@ -52,7 +61,7 @@ export const UserSidebarFooter = () => {
                         </DropdownMenuGroup>
 
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleLogout}>
                             <LogOut />
                             Log out
                         </DropdownMenuItem>

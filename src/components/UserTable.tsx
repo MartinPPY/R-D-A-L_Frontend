@@ -1,3 +1,4 @@
+import { diferenciaEntreHoras } from "@/helpers/activityHelper";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { ScrollArea } from "./ui/scroll-area";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
@@ -13,25 +14,6 @@ interface Activity {
     };
 }
 
-const diferenciaEntreHoras = (inicio: string, fin: string) => {
-
-    const toSeconds = (t: string) => {
-        const [h, m, s] = t.split(":").map(Number);
-        return h * 3600 + m * 60 + s;
-    };
-
-    let diff = toSeconds(fin) - toSeconds(inicio);
-
-    // si cruza medianoche
-    if (diff < 0) {
-        diff += 24 * 3600;
-    }
-
-    // convertir a horas y redondear
-    return Math.round(diff / 3600);
-
-}
-
 export const UserTable = ({ actividades }: { actividades: Activity[] }) => {
     return (
         <div className="px-12">
@@ -43,7 +25,7 @@ export const UserTable = ({ actividades }: { actividades: Activity[] }) => {
                 <CardContent>
                     <ScrollArea className="h-80">
                         <Table>
-                            <TableCaption> Actividades del mes de octubre</TableCaption>
+                            <TableCaption> Actividades del mes de {new Date().toLocaleString('default', { month: 'long' })}</TableCaption>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Hora de inicio</TableHead>

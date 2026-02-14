@@ -25,8 +25,8 @@ export const UserCardsSection = ({ resumen }: { resumen: ResumenMensual }) => {
             icon: Calendar,
         },
         {
-            title: "Horas aprobadas",
-            value: resumen.horas_aprobadas?.toString() + "h",
+            title: "Actividades aprobadas",
+            value: resumen.horas_aprobadas?.toString() + "",
             description: "Del mes de " + new Date().toLocaleString('default', { month: 'long' }),
             icon: Check
         },

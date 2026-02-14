@@ -4,6 +4,7 @@ import { UserTable } from "@/components/UserTable"
 import { UserLayout } from "@/layouts/UserLayout"
 import { getActivities } from "@/services/actividadService"
 import { getResumenMensualAlumno } from "@/services/resumenService"
+import { CirclePlus, Clock,Home as HomeIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface Activity {
@@ -23,8 +24,18 @@ interface ResumenMensual{
   horas_aprobadas:number;
 }
 
+interface Menu{
+  title:string;
+  icon:React.ReactNode;
+}
 
 export const Home = () => {
+
+  const menus:Menu[] = [
+    {title:"Inicio",icon:<HomeIcon />},
+    {title:"Registrar una actividad",icon:<CirclePlus />},
+    {title:"Ver mis horas de trabajo",icon:<Clock />},
+  ]
 
   const [actividades, setActividades] = useState<Activity[]>([])
   const [resumen,setResumenMensual] = useState<ResumenMensual>({
@@ -51,7 +62,7 @@ export const Home = () => {
   }, [])
 
   return (
-    <UserLayout>
+    <UserLayout menus={menus} title="R-D-A-L">
       <div className="flex flex-col gap-20 p-4">
         <UserCardsSection resumen={resumen} />
         <UserFormSection setActividades={setActividades}  setResumenMensual={setResumenMensual} />    

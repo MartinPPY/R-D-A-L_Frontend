@@ -36,7 +36,7 @@ export const Login = () => {
             await login(data.username, data.password)
             const response = await getPermisos()
 
-            if (response.data.permisos[0][1] === "administrador") {
+            if (response.data.permisos[0][1] === "moderador") {
                 navigate("/admin")
             } else {
                 navigate("/home")

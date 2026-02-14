@@ -17,3 +17,8 @@ export const getActivities = async ()=>{
     const response = await api.get("/v1/core/actividad/", { withCredentials: true })
     return response.data
 }
+
+export const updateStatus = async(id:number)=>{
+    const response = await api.patch(`/v1/core/actividad/${id}/`,{aprobado:true},{withCredentials:true})
+    return response.data
+}
