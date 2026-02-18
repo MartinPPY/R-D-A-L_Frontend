@@ -2,17 +2,7 @@ import { diferenciaEntreHoras } from "@/helpers/activityHelper";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { ScrollArea } from "./ui/scroll-area";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
-
-interface Activity {
-    id: number;
-    fecha: string;
-    hora_inicio: string;
-    hora_fin: string;
-    area: {
-        id: number,
-        name: string
-    };
-}
+import type { Activity } from "@/models/models";
 
 export const UserTable = ({ actividades }: { actividades: Activity[] }) => {
     return (
@@ -25,6 +15,7 @@ export const UserTable = ({ actividades }: { actividades: Activity[] }) => {
                 <CardContent>
                     <ScrollArea className="h-80">
                         <Table>
+                            <TableCaption> {actividades.length === 0 && "No hay actividades"}</TableCaption>
                             <TableCaption> Actividades del mes de {new Date().toLocaleString('default', { month: 'long' })}</TableCaption>
                             <TableHeader>
                                 <TableRow>

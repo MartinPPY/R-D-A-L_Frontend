@@ -2,21 +2,12 @@ import { UserCardsSection } from "@/components/UserCardsSection"
 import { UserFormSection } from "@/components/UserFormSection"
 import { UserTable } from "@/components/UserTable"
 import { UserLayout } from "@/layouts/UserLayout"
+import type { Activity } from "@/models"
 import { getActivities } from "@/services/actividadService"
 import { getResumenMensualAlumno } from "@/services/resumenService"
-import { CirclePlus, Clock,Home as HomeIcon } from "lucide-react"
+//import { CirclePlus, Clock,Home as HomeIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 
-interface Activity {
-  id: number;
-  fecha: string;
-  hora_inicio: string;
-  hora_fin: string;
-  area: {
-    id: number,
-    name: string
-  };
-}
 
 interface ResumenMensual{
   horas_acumuladas:number;
@@ -32,9 +23,9 @@ interface Menu{
 export const Home = () => {
 
   const menus:Menu[] = [
-    {title:"Inicio",icon:<HomeIcon />},
+    /*{title:"Inicio",icon:<HomeIcon />},
     {title:"Registrar una actividad",icon:<CirclePlus />},
-    {title:"Ver mis horas de trabajo",icon:<Clock />},
+    {title:"Ver mis horas de trabajo",icon:<Clock />},*/
   ]
 
   const [actividades, setActividades] = useState<Activity[]>([])

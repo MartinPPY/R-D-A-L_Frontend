@@ -1,4 +1,4 @@
-import { Calendar, Check, DollarSign, Ticket, type LucideProps } from "lucide-react"
+import { Calendar, Check, DollarSign, /*Ticket,*/ type LucideProps } from "lucide-react"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 
@@ -36,12 +36,12 @@ export const UserCardsSection = ({ resumen }: { resumen: ResumenMensual }) => {
             description: "Del mes de " + new Date().toLocaleString('default', { month: 'long' }),
             icon: DollarSign
         },
-        {
+        /*{
             title: "Orden de compra",
             value: "123456789",
             description: "Del mes de " + new Date().toLocaleString('default', { month: 'long' }),
             icon: Ticket
-        }
+        }*/
 
     ]
 

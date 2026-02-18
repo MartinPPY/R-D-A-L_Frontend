@@ -2,13 +2,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Link, useNavigate } from "react-router-dom"
+import { /*Link ,*/useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
 import { Eye, EyeOff, InfoIcon } from "lucide-react"
 import { getPermisos, login } from "@/services/authService"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useAuth } from "@/context/AuthContext"
 
 interface FormValues {
     username: string
@@ -21,6 +22,7 @@ export const Login = () => {
     const [loading, setLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [error, setError] = useState<string | null>(null)
+
     const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
         defaultValues: {
             username: "",
@@ -28,6 +30,7 @@ export const Login = () => {
         }
     })
     const navigate = useNavigate()
+    const {setAuthenticated,setRol} = useAuth()
 
     const onSubmit = async (data: FormValues) => {
         try {
@@ -35,6 +38,8 @@ export const Login = () => {
             setLoading(true)
             await login(data.username, data.password)
             const response = await getPermisos()
+            setAuthenticated(true)
+            setRol(response.data.permisos[0][1])
 
             if (response.data.permisos[0][1] === "moderador") {
                 navigate("/admin")
@@ -45,8 +50,8 @@ export const Login = () => {
             reset()
 
         } catch (error: any) {
-            console.error(error)
-            setError("Verifica tus credenciales")
+            console.error(error.response)
+            setError(error.response.data.detail || "Ha ocurrido un error. Verifica tus credenciales")
 
         } finally {
             setLoading(false)
@@ -89,9 +94,9 @@ export const Login = () => {
                                 </button>
                                 {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
                             </div>
-                            <div className="space-y-4 mt-4 flex justify-end">
+                            {/*<div className="space-y-4 mt-4 flex justify-end">
                                 <Link to={loading ? "#" : "/forgot-password"} className="text-sm text-black hover:underline" >¿Olvidaste tu contraseña?</Link>
-                            </div>
+                            </div>*/}
                         </CardContent>
 
                         <CardFooter className="flex gap-2">

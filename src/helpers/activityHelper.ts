@@ -16,3 +16,11 @@ export const diferenciaEntreHoras = (inicio: string, fin: string) => {
     return Math.round(diff / 3600);
 
 }
+
+export const parseDate = (date:Date):string =>{
+    const dateObj = new Date(date)
+    const fecha = dateObj.getFullYear() + "-" + "0" + 
+        (dateObj.getMonth() + 1) + "-" + (dateObj.getDate().toString().length === 1 ? "0" + dateObj.getDate() : dateObj.getDate())
+
+    return fecha
+}

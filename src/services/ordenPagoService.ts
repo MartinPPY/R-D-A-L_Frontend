@@ -1,4 +1,4 @@
-import api from "./axiosService"
+import api from "@/api/config"
 
 interface OrdenCompra{
     fecha:string;
@@ -7,6 +7,6 @@ interface OrdenCompra{
 }
 
 export const createOrdenCompra = async(ordenCompra:OrdenCompra)=>{
-    const response = await api.post("/v1/core/orden-compra/",ordenCompra,{withCredentials:true})
+    const response = await api.post("/v1/core/orden-compra/",ordenCompra)
     return response.data
 }

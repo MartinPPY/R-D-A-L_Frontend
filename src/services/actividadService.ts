@@ -1,4 +1,4 @@
-import api from "./axiosService"
+import api from "@/api/config"
 
 interface Activity {
     fecha: string,
@@ -9,16 +9,16 @@ interface Activity {
 
 
 export const createActivity = async (activity: Activity) => {
-    const response = await api.post("/v1/core/actividad/", activity, { withCredentials: true })
+    const response = await api.post("/v1/core/actividad/", activity)
     return response.data
 }
 
 export const getActivities = async ()=>{
-    const response = await api.get("/v1/core/actividad/", { withCredentials: true })
+    const response = await api.get("/v1/core/actividad/")
     return response.data
 }
 
 export const updateStatus = async(id:number)=>{
-    const response = await api.patch(`/v1/core/actividad/${id}/`,{aprobado:true},{withCredentials:true})
+    const response = await api.patch(`/v1/core/actividad/${id}/`,{aprobado:true})
     return response.data
 }

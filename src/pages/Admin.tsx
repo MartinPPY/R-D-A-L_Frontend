@@ -2,38 +2,11 @@ import { AdminActivityTable } from "@/components/AdminActivityTable";
 import { AdminCardSection } from "@/components/AdminCardSection";
 import { AdminPagosTable } from "@/components/AdminPagosTable";
 import { UserLayout } from "@/layouts/UserLayout"
+import type { Actividad, Menu, Resumen } from "@/models";
 import { getActivities } from "@/services/actividadService";
 import { getResumenMensualAdmin } from "@/services/resumenService";
-import { BookOpen, CreditCard, Home } from "lucide-react";
+//import { BookOpen, CreditCard, Home } from "lucide-react";
 import { useEffect, useState } from "react";
-
-interface Menu {
-    title: string;
-    icon: React.ReactNode;
-}
-
-interface Resumen {
-    usuarios: number;
-    cantidad_horas: number;
-    cantidad_orden_compra: number;
-}
-
-interface Actividad {
-    id: number;
-    area: {
-        id: number;
-        name: string;
-    };
-    user: {
-        id: number;
-        first_name: string;
-        last_name: string;
-    };
-    fecha: string;
-    hora_inicio: string;
-    hora_fin: string;
-    aprobado: boolean;
-}
 
 export const Admin = () => {
 
@@ -46,9 +19,9 @@ export const Admin = () => {
 
     const title = "R-D-A-L Administracion"
     const menus: Menu[] = [
-        { title: "Inicio", icon: <Home /> },
+        /*{ title: "Inicio", icon: <Home /> },
         { title: "Gestionar Actividades", icon: <BookOpen /> },
-        { title: "Gestionar ordenes de pago", icon: <CreditCard /> },
+        { title: "Gestionar ordenes de pago", icon: <CreditCard /> },*/
     ]
 
     useEffect(() => {
@@ -72,10 +45,8 @@ export const Admin = () => {
         <UserLayout menus={menus} title={title}>
             <div className="flex flex-col gap-20 p-4">
                 <AdminCardSection resumen={resumen} />
-                <AdminActivityTable actividades={actividades} setResumen={setResumen} />
-                <AdminPagosTable />
-
-
+                <AdminActivityTable actividades={actividades} setResumen={setResumen} setActividades={setActividades} />
+                <AdminPagosTable setResumen={setResumen} />
             </div>
         </UserLayout>
     )

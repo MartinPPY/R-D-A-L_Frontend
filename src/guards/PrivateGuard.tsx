@@ -1,5 +1,5 @@
 import { useAuth } from "@/context/AuthContext"
-import { Outlet } from "react-router-dom"
+import { Navigate, Outlet } from "react-router-dom"
 
 export const PrivateGuard = ({rolProp}: {rolProp: string}) => {
     const { loading, authenticated, rol } = useAuth()
@@ -8,8 +8,8 @@ export const PrivateGuard = ({rolProp}: {rolProp: string}) => {
         return <div>Cargando...</div>
     }
 
-    if (!authenticated) {
-        return <div>No autenticado</div>
+    if (authenticated === false) {
+        <Navigate  to="/login" />
     }
 
     return rol === rolProp ? <Outlet /> : <div>No tienes permiso para acceder a esta página</div>

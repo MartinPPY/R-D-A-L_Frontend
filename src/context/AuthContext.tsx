@@ -14,6 +14,8 @@ interface AuthContextType {
     loading: boolean;
     user: User | null;
     rol:string;
+    setAuthenticated: (authenticated: boolean) => void;
+    setRol: (rol: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -64,6 +66,8 @@ export const AuthProvider = ({ children }: Props) => {
                 loading,
                 user,
                 rol,
+                setAuthenticated,
+                setRol
             }}
         >
             {children}

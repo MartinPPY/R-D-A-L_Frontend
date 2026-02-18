@@ -1,66 +1,22 @@
-import { CalendarIcon } from "lucide-react"
-import { Button } from "./ui/button"
-import { Calendar } from "./ui/calendar"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card"
-import { Label } from "./ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
-import { Input } from "./ui/input"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
-import { useEffect, useState } from "react"
-import { getAreas } from "@/services/areaService"
-import { Controller, useForm } from "react-hook-form"
-import { createActivity, getActivities } from "@/services/actividadService"
-import { Spinner } from "./ui/spinner"
+import {Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,Spinner} from "./ui"
 import { toast } from "sonner"
-import { getResumenMensualAlumno } from "@/services/resumenService"
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
+import { getAreas, createActivity, getActivities, getResumenMensualAlumno } from "@/services"
+import type { Activity, Area, FormValues, RequestBody, ResumenMensualUser } from "@/models"
+import { parseDate } from "@/helpers"
+import { AreaFieldForm, FechaFieldForm, HorasFieldForm } from "./user-form"
 
-interface Area {
-    id: number;
-    name: string;
-}
-
-interface FormValues {
-    date: Date;
-    startTime: string;
-    endTime: string;
-    area: string;
-}
-
-interface RequestBody {
-    fecha: string,
-    hora_inicio: string,
-    hora_fin: string,
-    area_id: number
-}
-
-interface Activity {
-    id: number;
-    fecha: string;
-    hora_inicio: string;
-    hora_fin: string;
-    area: {
-        id: number,
-        name: string
-    };
-}
-
-interface ResumenMensual{
-  horas_acumuladas:number;
-  total_acumulado:number;
-  horas_aprobadas:number;
-}
-
-interface Props{
+interface Props {
     setActividades: React.Dispatch<React.SetStateAction<Activity[]>>;
-    setResumenMensual: React.Dispatch<React.SetStateAction<ResumenMensual>>;
+    setResumenMensual: React.Dispatch<React.SetStateAction<ResumenMensualUser>>;
 }
 
-export const UserFormSection = (
-    { setActividades, setResumenMensual }: Props
-) => {
+export const UserFormSection = ({ setActividades, setResumenMensual }: Props) => {
 
     const [areas, setAreas] = useState<Area[]>([])
     const [loading, setLoading] = useState(false)
+
     const { register, handleSubmit, formState: { errors }, control, reset } = useForm<FormValues>({
         defaultValues: {
             date: new Date(),
@@ -84,8 +40,7 @@ export const UserFormSection = (
 
     const onSubmit = async (data: FormValues) => {
 
-        const dateObj = new Date(data.date)
-        const fecha = dateObj.getFullYear() + "-" + "0" + (dateObj.getMonth() + 1) + "-" + (dateObj.getDate().toString().length === 1 ? "0" + dateObj.getDate() : dateObj.getDate())
+        const fecha = parseDate(data.date)
 
         const body: RequestBody = {
             fecha: fecha,
@@ -95,9 +50,13 @@ export const UserFormSection = (
         }
 
         try {
+
             setLoading(true)
             await createActivity(body)
-            toast("Actividad registrada exitosamente")
+            toast.success("Actividad registrada exitosamente", {
+                duration: 3000,
+                position: "top-center"
+            })
 
             const response = await getActivities()
             setActividades(response)
@@ -105,10 +64,12 @@ export const UserFormSection = (
             setResumenMensual(resResumenMensual)
 
         } catch (error: any) {
-            console.log(error.response)
+
+            console.error(error.response)
             toast("Error al registrar actividad", {
-                position: "top-right"
+                position: "top-center"
             })
+
         } finally {
             setLoading(false)
             reset()
@@ -124,85 +85,11 @@ export const UserFormSection = (
                         <CardDescription>Formulario para registrar horas</CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-6">
-                        <div className="flex flex-col gap-2">
-                            <Label> Fecha de actividad: </Label>
-                            <Controller
-                                name="date"
-                                control={control}
-                                rules={{ required: "La fecha es obligatoria!" }}
-                                render={({ field }) => (
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className={`w-full justify-start text-left font-normal ${!field.value && "text-muted-foreground"
-                                                    }`}
-                                            >
-                                                <CalendarIcon />
-                                                {field.value
-                                                    ? field.value.toLocaleDateString()
-                                                    : <span>Indica una fecha</span>}
-                                            </Button>
-                                        </PopoverTrigger>
 
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value}
-                                                onSelect={field.onChange}
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                )}
-                            />
+                        <FechaFieldForm control={control} errors={errors} />
+                        <HorasFieldForm register={register} errors={errors} />
+                        <AreaFieldForm control={control} errors={errors} areas={areas} />
 
-                            {errors.date && <p className="text-red-500">{errors.date.message}</p>}
-
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-                            <div className="flex flex-col gap-2">
-                                <Label>Hora de inicio: </Label>
-                                <Input type="time" {...register("startTime", { required: "La hora de inicio es requerida" })} />
-                                {errors.startTime && <p className="text-red-500">{errors.startTime.message}</p>}
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label>Hora de fin: </Label>
-                                <Input type="time" {...register("endTime", { required: "La hora de fin es requerida" })} />
-                                {errors.endTime && <p className="text-red-500">{errors.endTime.message}</p>}
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                            <Label> Area de trabajo: </Label>
-                            <Controller
-                                name="area"
-                                control={control}
-                                rules={{ required: "El área de trabajo es requerida" }}
-                                render={({ field }) => (
-                                    <Select
-                                        onValueChange={field.onChange}
-                                        value={field.value}
-                                    >
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Selecciona un área" />
-                                        </SelectTrigger>
-
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                {areas.map((area, index) => (
-                                                    <SelectItem key={index} value={area.id.toString()}>
-                                                        {area.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-                                )}
-                            />
-                            {errors.area && <p className="text-red-500">{errors.area.message}</p>}
-                        </div>
                     </CardContent>
                     <CardFooter>
                         <Button type="submit" disabled={loading}>

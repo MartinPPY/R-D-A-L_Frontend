@@ -5,11 +5,12 @@ import { Login } from "./pages/Login"
 import { ForgotPassword } from "./pages/ForgotPassword"
 import { Admin } from "./pages/Admin"
 import { PrivateGuard } from "./guards/PrivateGuard"
+import { RedirectGuard } from "./guards/RedirectGuard"
 
 export const AppRouter = () => {
     return (
         <RoutesWithNotFound>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<RedirectGuard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route element={<PrivateGuard rolProp="usuario" />}>

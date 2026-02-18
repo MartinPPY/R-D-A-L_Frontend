@@ -4,35 +4,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { ScrollArea } from "./ui/scroll-area"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 import { useState } from "react"
-import { getResumenPagoMensual } from "@/services/resumenService"
+import { getResumenMensualAdmin, getResumenPagoMensual } from "@/services/resumenService"
 import { createOrdenCompra } from "@/services/ordenPagoService"
+import { toast } from "sonner"
+import type { OrdenCompra, Resumen, ResumenPago } from "@/models"
 
-interface ResumenPago {
-    user_id: number;
-    usuario: string;
-    monto_acumulado: number;
+interface Props{
+    setResumen:React.Dispatch<React.SetStateAction<Resumen>>; 
 }
 
-interface OrdenCompra{
-    fecha:string;
-    monto:number;
-    user:number;
-}
-
-export const AdminPagosTable = () => {
+export const AdminPagosTable = ({setResumen}:Props) => {
 
     const [resumenPago, setResumenPago] = useState<ResumenPago[]>([])
+    const [loading,setLoading] = useState<boolean>(false)
 
     const handleClick = async () => {
-        const resumenPago = await getResumenPagoMensual()
-
-        console.log(resumenPago)
+        const resumenPago = await getResumenPagoMensual()        
         setResumenPago(resumenPago)
     }
 
     const crearOrdenCompra = async (user_id:number, monto:number) => {
 
-        const date = new Date().getFullYear() + "-" + "0" + (new Date().getMonth() + 1) + "-" + (new Date().getDate().toString().length === 1 ? "0" + new Date().getDate() : new Date().getDate())
+        const date = new Date().getFullYear() + "-" + "0" + 
+        (new Date().getMonth() + 1) + "-" + (new Date().getDate().toString().length === 1 ? "0" + 
+        new Date().getDate() : new Date().getDate())
 
         const ordenCompra:OrdenCompra = {
             fecha:date,
@@ -40,12 +35,20 @@ export const AdminPagosTable = () => {
             user:user_id    
         }
 
-        console.log(ordenCompra)
-
         try {
+            setLoading(true)
             await createOrdenCompra(ordenCompra)
+            toast.success("Orden de compra creada exitosamente")
+            setResumenPago([])
+            const resumen = await getResumenMensualAdmin()
+            setResumen(resumen)
         } catch (error:any) {
-            console.log(error.response)
+
+            toast.error("Error al crear orden de compra")
+            console.error(error)
+        } finally{
+            setLoading(false)
+
         }
 
     }
@@ -66,7 +69,9 @@ export const AdminPagosTable = () => {
                 <CardContent>
                     <ScrollArea className="w-full">
                         <Table>
-                            <TableCaption><Button size="sm" onClick={handleClick} >Generar Pagos a los usuarios</Button></TableCaption>
+                            <TableCaption>
+                                <Button size="sm" onClick={handleClick} >{loading ? "Generando..." : "Generar Pagos"}</Button>
+                            </TableCaption>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Nombre</TableHead>
@@ -81,7 +86,14 @@ export const AdminPagosTable = () => {
                                             <TableRow key={index}>
                                                 <TableCell>{resumen.usuario}</TableCell>
                                                 <TableCell>{resumen.monto_acumulado}</TableCell>
-                                                <TableCell> <Button size="sm" variant="outline" onClick={() => crearOrdenCompra(resumen.user_id, resumen.monto_acumulado)}>Subir orden de compra</Button></TableCell>
+                                                <TableCell> 
+                                                    <Button 
+                                                        size="sm" 
+                                                        variant="outline" 
+                                                        onClick={() => crearOrdenCompra(resumen.user_id, resumen.monto_acumulado)}>
+                                                            {loading ? "Subiendo..." : "Subir orden de compra"}
+                                                    </Button>
+                                                </TableCell>
                                             </TableRow>
                                         )
                                     ))

@@ -1,8 +1,8 @@
-import api from "./axiosService"
+import api from "@/api/config"
 
 export const getAreas = async () => {
 
-    const response = await api.get("/v1/core/area", { withCredentials: true })
+    const response = await api.get("/v1/core/area")
     return response
 
 }

@@ -1,5 +1,8 @@
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar"
-import { UserSidebarFooter } from "./UserSidebarFooter"
+import { LogOut } from "lucide-react";
+import { Sidebar, SidebarContent, /*SidebarFooter,*/ SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar"
+import { useNavigate } from "react-router-dom";
+import { logout } from "@/services/authService";
+//import { UserSidebarFooter } from "./UserSidebarFooter"
 
 interface Menu {
     title: string;
@@ -7,6 +10,14 @@ interface Menu {
 }
 
 export const UserAppSidebar = ({menu,title}: {menu: Menu[], title: string}) => {
+
+    const navigate = useNavigate()
+
+    const handleLogout = async()=>{
+        await logout()
+        navigate("/login")
+    }
+
     return (
         <Sidebar>
             <SidebarHeader>
@@ -30,6 +41,13 @@ export const UserAppSidebar = ({menu,title}: {menu: Menu[], title: string}) => {
                             ))
                         }
 
+                        <SidebarMenuItem>
+                            <SidebarMenuButton className="hover:bg-gray-100 font-medium" onClick={handleLogout}>
+                                <LogOut />
+                                Log out
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+
                     </SidebarMenu>
 
                 </SidebarGroup>
@@ -37,9 +55,11 @@ export const UserAppSidebar = ({menu,title}: {menu: Menu[], title: string}) => {
             </SidebarContent>
 
 
+            {/* 
             <SidebarFooter>
                 <UserSidebarFooter />
             </SidebarFooter>
+            */}
         </Sidebar>
     )
 }

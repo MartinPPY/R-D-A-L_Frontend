@@ -1,4 +1,3 @@
-import { diferenciaEntreHoras } from "@/helpers/activityHelper";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button"
@@ -6,28 +5,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { ScrollArea } from "./ui/scroll-area"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 import { toast } from "sonner";
-import { updateStatus } from "@/services/actividadService";
+import { getActivities, updateStatus } from "@/services/actividadService";
 import { getResumenMensualAdmin } from "@/services/resumenService";
+import { diferenciaEntreHoras } from "@/helpers/activityHelper";
+import type { Actividad, Resumen } from "@/models";
 
-interface Actividad {
-    id: number;
-    area: {
-        id: number;
-        name: string;
-    };
-    user: {
-        id: number;
-        first_name: string;
-        last_name: string;
-    };
-    fecha: string;
-    hora_inicio: string;
-    hora_fin: string;
-    aprobado: boolean;
+interface Props{
+    actividades:Actividad[];
+    setResumen:React.Dispatch<React.SetStateAction<Resumen>>;
+    setActividades:React.Dispatch<React.SetStateAction<Actividad[]>>;
 }
 
 
-export const AdminActivityTable = ({ actividades, setResumen }: { actividades: Actividad[], setResumen: (resumen: any) => void }) => {
+export const AdminActivityTable = ({ actividades, setResumen, setActividades }: Props) => {
 
     const aprobarActividad = async (id:number) => {
         try {
@@ -35,7 +25,9 @@ export const AdminActivityTable = ({ actividades, setResumen }: { actividades: A
             await updateStatus(id)
             toast("Actividad aprobada",{position:"top-center"});
             const response = await getResumenMensualAdmin()
-            setResumen(response)        
+            setResumen(response)
+            const actividades = await getActivities()        
+            setActividades(actividades)
 
         } catch (error:any) {
 
