@@ -1,65 +1,17 @@
-import { ChartColumn, Info } from "lucide-react"
-import { Button } from "./ui/button"
+import { Info } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { ScrollArea } from "./ui/scroll-area"
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
-import { useState } from "react"
-import { getResumenMensualAdmin, getResumenPagoMensual } from "@/services/resumenService"
-import { createOrdenCompra } from "@/services/ordenPagoService"
-import { toast } from "sonner"
-import type { OrdenCompra, Resumen, ResumenPago } from "@/models"
+import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from "./ui/table"
+import { useQuery } from "@tanstack/react-query"
+import { getResumenPagoMensual } from "@/api"
+import { AdminPagosData } from "./AdminPagosData"
 
-interface Props{
-    setResumen:React.Dispatch<React.SetStateAction<Resumen>>; 
-}
+export const AdminPagosTable = () => {
 
-export const AdminPagosTable = ({setResumen}:Props) => {
-
-    const [resumenPago, setResumenPago] = useState<ResumenPago[]>([])
-    const [loading,setLoading] = useState<boolean>(false)
-
-    const handleClick = async () => {
-        const resumenPago = await getResumenPagoMensual()        
-        setResumenPago(resumenPago)
-    }
-
-    const crearOrdenCompra = async (user_id:number, monto:number) => {
-
-        const date = new Date().getFullYear() + "-" + "0" + 
-        (new Date().getMonth() + 1) + "-" + (new Date().getDate().toString().length === 1 ? "0" + 
-        new Date().getDate() : new Date().getDate())
-
-        const ordenCompra:OrdenCompra = {
-            fecha:date,
-            monto:monto,
-            user:user_id    
-        }
-
-        try {
-            setLoading(true)
-            await createOrdenCompra(ordenCompra)
-            toast.success("Orden de compra creada exitosamente")
-            setResumenPago([])
-            const resumen = await getResumenMensualAdmin()
-            setResumen(resumen)
-        } catch (error:any) {
-
-            toast.error("Error al crear orden de compra")
-            console.error(error)
-        } finally{
-            setLoading(false)
-
-        }
-
-    }
-
-
+    const resumenPagoQuery = useQuery({ queryKey: ["resumen-pago"], queryFn: getResumenPagoMensual })
 
     return (
         <div className="px-12">
-            <div className="flex justify-end mb-4">
-                <Button>Descargar reporte <ChartColumn /> </Button>
-            </div>
             <Card>
                 <CardHeader>
                     <CardTitle className="flex gap-2 " >
@@ -70,7 +22,7 @@ export const AdminPagosTable = ({setResumen}:Props) => {
                     <ScrollArea className="w-full">
                         <Table>
                             <TableCaption>
-                                <Button size="sm" onClick={handleClick} >{loading ? "Generando..." : "Generar Pagos"}</Button>
+                                Del mes de {new Date().toLocaleDateString('es-ES', { month: 'long' })}
                             </TableCaption>
                             <TableHeader>
                                 <TableRow>
@@ -80,24 +32,7 @@ export const AdminPagosTable = ({setResumen}:Props) => {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {
-                                    resumenPago.map((resumen, index) => (
-                                        resumen.monto_acumulado > 0 && (
-                                            <TableRow key={index}>
-                                                <TableCell>{resumen.usuario}</TableCell>
-                                                <TableCell>{resumen.monto_acumulado}</TableCell>
-                                                <TableCell> 
-                                                    <Button 
-                                                        size="sm" 
-                                                        variant="outline" 
-                                                        onClick={() => crearOrdenCompra(resumen.user_id, resumen.monto_acumulado)}>
-                                                            {loading ? "Subiendo..." : "Subir orden de compra"}
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        )
-                                    ))
-                                }
+                                <AdminPagosData resumenPagos={resumenPagoQuery.data || []} />
                             </TableBody>
                         </Table>
                     </ScrollArea>

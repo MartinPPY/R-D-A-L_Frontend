@@ -1,22 +1,32 @@
-import {Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,Spinner} from "./ui"
-import { toast } from "sonner"
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import { getAreas, createActivity, getActivities, getResumenMensualAlumno } from "@/services"
-import type { Activity, Area, FormValues, RequestBody, ResumenMensualUser } from "@/models"
-import { parseDate } from "@/helpers"
+import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Skeleton, Spinner } from "./ui"
 import { AreaFieldForm, FechaFieldForm, HorasFieldForm } from "./user-form"
+import { toast } from "sonner"
+import { useForm } from "react-hook-form"
+import { createActivity, getAreas } from "@/api"
+import type { FormValues, RequestBody } from "@/models"
+import { parseDate } from "@/helpers"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
-interface Props {
-    setActividades: React.Dispatch<React.SetStateAction<Activity[]>>;
-    setResumenMensual: React.Dispatch<React.SetStateAction<ResumenMensualUser>>;
-}
 
-export const UserFormSection = ({ setActividades, setResumenMensual }: Props) => {
+export const UserFormSection = () => {
 
-    const [areas, setAreas] = useState<Area[]>([])
-    const [loading, setLoading] = useState(false)
-
+    const queryClient = useQueryClient()
+    const areasQuery = useQuery({ queryKey: ["areas"], queryFn: getAreas })
+    const mutation = useMutation({
+        mutationFn: createActivity,
+        onSuccess: async () => {
+            toast.success("Actividad registrada exitosamente", { position: "top-center" })
+            reset()
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ["activities"] }),
+                queryClient.invalidateQueries({ queryKey: ["resumen-usuario"] })
+            ])
+        },
+        onError: (error) => {
+            console.error(error)
+            toast.error("Error al registrar la actividad", { position: "top-center" })
+        }
+    })
     const { register, handleSubmit, formState: { errors }, control, reset } = useForm<FormValues>({
         defaultValues: {
             date: new Date(),
@@ -25,55 +35,16 @@ export const UserFormSection = ({ setActividades, setResumenMensual }: Props) =>
             area: ""
         }
     })
-
-
-    useEffect(() => {
-
-        const fetchAreas = async () => {
-            const response = await getAreas()
-            setAreas(response.data.areas)
-        }
-
-        fetchAreas()
-
-    }, [])
-
     const onSubmit = async (data: FormValues) => {
 
         const fecha = parseDate(data.date)
-
         const body: RequestBody = {
             fecha: fecha,
             hora_inicio: data.startTime,
             hora_fin: data.endTime,
             area_id: parseInt(data.area)
         }
-
-        try {
-
-            setLoading(true)
-            await createActivity(body)
-            toast.success("Actividad registrada exitosamente", {
-                duration: 3000,
-                position: "top-center"
-            })
-
-            const response = await getActivities()
-            setActividades(response)
-            const resResumenMensual = await getResumenMensualAlumno()
-            setResumenMensual(resResumenMensual)
-
-        } catch (error: any) {
-
-            console.error(error.response)
-            toast("Error al registrar actividad", {
-                position: "top-center"
-            })
-
-        } finally {
-            setLoading(false)
-            reset()
-        }
+        mutation.mutate(body)
     }
 
     return (
@@ -85,15 +56,14 @@ export const UserFormSection = ({ setActividades, setResumenMensual }: Props) =>
                         <CardDescription>Formulario para registrar horas</CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-6">
-
                         <FechaFieldForm control={control} errors={errors} />
                         <HorasFieldForm register={register} errors={errors} />
-                        <AreaFieldForm control={control} errors={errors} areas={areas} />
-
+                        {areasQuery.isLoading ? <Skeleton className="h-10 w-full" /> : <AreaFieldForm control={control} errors={errors} areas={areasQuery.data || []} />}
+                        {areasQuery.isError && <p>Error: {areasQuery.error.message}</p>}
                     </CardContent>
                     <CardFooter>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? <> <Spinner /> Registrando... </> : "Registrar"}
+                        <Button type="submit">
+                            {mutation.isPending ? <> <Spinner /> Registrando... </> : "Registrar"}
                         </Button>
                     </CardFooter>
                 </Card>

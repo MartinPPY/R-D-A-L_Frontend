@@ -13,7 +13,9 @@ export const UserLayout = ({ children,menus,title }: {children: ReactNode,menus:
         <SidebarProvider>
             <UserAppSidebar menu={menus} title={title}/>
             <main className="w-full">
-                <SidebarTrigger />
+                <div className="p-2">
+                    <SidebarTrigger />
+                </div>
                 {children}
             </main>
         </SidebarProvider>

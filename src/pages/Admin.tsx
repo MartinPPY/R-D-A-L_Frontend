@@ -2,20 +2,16 @@ import { AdminActivityTable } from "@/components/AdminActivityTable";
 import { AdminCardSection } from "@/components/AdminCardSection";
 import { AdminPagosTable } from "@/components/AdminPagosTable";
 import { UserLayout } from "@/layouts/UserLayout"
-import type { Actividad, Menu, Resumen } from "@/models";
+import type { Menu } from "@/models";
 import { getActivities } from "@/services/actividadService";
 import { getResumenMensualAdmin } from "@/services/resumenService";
+import { useQuery } from "@tanstack/react-query";
 //import { BookOpen, CreditCard, Home } from "lucide-react";
-import { useEffect, useState } from "react";
 
 export const Admin = () => {
 
-    const [actividades, setActividades] = useState<Actividad[]>([])
-    const [resumen, setResumen] = useState<Resumen>({
-        usuarios: 0,
-        cantidad_horas: 0,
-        cantidad_orden_compra: 0
-    })
+    const activitiesQuery = useQuery({ queryKey: ["activities"], queryFn: getActivities })
+    const resumenQuery = useQuery({ queryKey: ["resumen-admin"], queryFn: getResumenMensualAdmin })
 
     const title = "R-D-A-L Administracion"
     const menus: Menu[] = [
@@ -24,29 +20,12 @@ export const Admin = () => {
         { title: "Gestionar ordenes de pago", icon: <CreditCard /> },*/
     ]
 
-    useEffect(() => {
-
-        const fetchResumen = async () => {
-            const response = await getResumenMensualAdmin()
-            setResumen(response)
-        }
-
-        const fetchActividades = async () => {
-            const response = await getActivities()
-            setActividades(response)
-        }
-
-        fetchResumen();
-        fetchActividades();
-
-    }, [])
-
     return (
         <UserLayout menus={menus} title={title}>
             <div className="flex flex-col gap-20 p-4">
-                <AdminCardSection resumen={resumen} />
-                <AdminActivityTable actividades={actividades} setResumen={setResumen} setActividades={setActividades} />
-                <AdminPagosTable setResumen={setResumen} />
+                <AdminCardSection resumen={resumenQuery.data || { usuarios: 0, cantidad_horas: 0, cantidad_orden_compra: 0 }} />
+                <AdminActivityTable actividades={activitiesQuery.data || []} />
+                <AdminPagosTable />
             </div>
         </UserLayout>
     )
