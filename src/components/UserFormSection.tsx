@@ -16,15 +16,18 @@ export const UserFormSection = () => {
         mutationFn: createActivity,
         onSuccess: async () => {
             toast.success("Actividad registrada exitosamente", { position: "top-center" })
-            reset()
+            reset()                                                        
             await Promise.all([
                 queryClient.invalidateQueries({ queryKey: ["activities"] }),
                 queryClient.invalidateQueries({ queryKey: ["resumen-usuario"] })
             ])
         },
-        onError: (error) => {
-            console.error(error)
-            toast.error("Error al registrar la actividad", { position: "top-center" })
+        onError: (error:any) => {
+            if(error.response.data.non_field_errors[0]){
+                toast.error(error.response.data.non_field_errors[0], { position: "top-center" })
+            }else{
+                toast.error("Error al registrar la actividad", { position: "top-center" })
+            }
         }
     })
     const { register, handleSubmit, formState: { errors }, control, reset } = useForm<FormValues>({
@@ -62,7 +65,7 @@ export const UserFormSection = () => {
                         {areasQuery.isError && <p>Error: {areasQuery.error.message}</p>}
                     </CardContent>
                     <CardFooter>
-                        <Button type="submit">
+                        <Button type="submit" disabled={mutation.isPending}>
                             {mutation.isPending ? <> <Spinner /> Registrando... </> : "Registrar"}
                         </Button>
                     </CardFooter>

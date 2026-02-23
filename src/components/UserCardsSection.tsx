@@ -1,4 +1,4 @@
-import { Calendar, Check, DollarSign, /*Ticket,*/ type LucideProps } from "lucide-react"
+import { Calendar, Check, DollarSign, Ticket, /*Ticket,*/ type LucideProps } from "lucide-react"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 
@@ -13,6 +13,7 @@ interface ResumenMensual {
     horas_acumuladas: number | null;
     total_acumulado: number | null;
     horas_aprobadas: number | null;
+    orden_compra:number | null
 }
 
 export const UserCardsSection = ({ resumen }: { resumen: ResumenMensual }) => {
@@ -36,12 +37,12 @@ export const UserCardsSection = ({ resumen }: { resumen: ResumenMensual }) => {
             description: "Del mes de " + new Date().toLocaleString('default', { month: 'long' }),
             icon: DollarSign
         },
-        /*{
+        {
             title: "Orden de compra",
-            value: "123456789",
+            value: resumen.orden_compra?.toString() || "N/A",
             description: "Del mes de " + new Date().toLocaleString('default', { month: 'long' }),
             icon: Ticket
-        }*/
+        }
 
     ]
 
