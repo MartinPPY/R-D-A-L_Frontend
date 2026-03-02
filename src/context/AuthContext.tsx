@@ -1,5 +1,6 @@
 import { getPermisos, verifyAuth } from "@/services/authService";
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { createContext, useContext, type ReactNode } from "react";
 
 interface Props {
     children: ReactNode
@@ -13,9 +14,9 @@ interface AuthContextType {
     authenticated: boolean;
     loading: boolean;
     user: User | null;
-    rol:string;
-    setAuthenticated: (authenticated: boolean) => void;
-    setRol: (rol: string) => void;
+    rol: string;
+    //setAuthenticated: (authenticated: boolean) => void;
+    //setRol: (rol: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -29,46 +30,42 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: Props) => {
-    const [authenticated, setAuthenticated] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [user, setUser] = useState<User | null>(null);
-    const [rol, setRol] = useState<string>("");
 
-    useEffect(() => {
-        const checkAuth = async () => {
+    const { data, isLoading } = useQuery({
+        queryKey: ["auth-user"],
+        queryFn: async () => {
             try {
-                const response = await verifyAuth();               
-                if (response) {
-                    setAuthenticated(true);
-                    setUser(response.user);
-                } else {
-                    setAuthenticated(false);
-                    setUser(null);
-                }
+                const authResponse = await verifyAuth();
 
-                const rolResponse = await getPermisos()                
-                setRol(rolResponse.data.permisos[0][1]);
-            } catch {
-                setAuthenticated(false);
-                setUser(null);
-            } finally {
-                setLoading(false);
+                if (!authResponse) return null;
+
+                // Solo si hay auth, buscamos los permisos (en paralelo o secuencia)
+                const rolResponse = await getPermisos();
+
+                return {
+                    user: authResponse.user,
+                    rol: rolResponse.data.permisos[0][1],
+                    authenticated: true
+                };
+            } catch (error) {
+                // Si falla cualquier llamada, devolvemos null (no autenticado)
+                return null;
             }
-        };
+        },
+        staleTime: 1000 * 60 * 10, // Considerar sesión fresca por 10 min
+        retry: false, // No reintentar en errores de auth (401/403)
+    })
 
-        checkAuth();
-    }, []);
+    const authValue: AuthContextType = {
+        user: data?.user ?? null,
+        rol: data?.rol ?? "",
+        authenticated: !!data?.authenticated,
+        loading: isLoading,
+    };
 
     return (
         <AuthContext.Provider
-            value={{
-                authenticated,
-                loading,
-                user,
-                rol,
-                setAuthenticated,
-                setRol
-            }}
+            value={authValue}
         >
             {children}
         </AuthContext.Provider>

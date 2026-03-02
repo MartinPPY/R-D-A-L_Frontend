@@ -9,7 +9,6 @@ import { Spinner } from "@/components/ui/spinner"
 import { Eye, EyeOff, InfoIcon } from "lucide-react"
 import { getPermisos, login } from "@/services/authService"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { useAuth } from "@/context/AuthContext"
 import { toast } from "sonner"
 
 interface FormValues {
@@ -31,7 +30,6 @@ export const Login = () => {
         }
     })
     const navigate = useNavigate()
-    const {setAuthenticated,setRol} = useAuth()
 
     const onSubmit = async (data: FormValues) => {
         try {
@@ -39,8 +37,6 @@ export const Login = () => {
             setLoading(true)
             await login(data.username, data.password)
             const response = await getPermisos()
-            setAuthenticated(true)
-            setRol(response.data.permisos[0][1])
 
             if (response.data.permisos[0][1] === "moderador") {
                 navigate("/admin")
@@ -68,7 +64,7 @@ export const Login = () => {
                 <div className="mb-4 mt-4 space-y-2 text-sm bg-muted p-3 rounded-lg" >
                     <h2 className="text-lg font-semibold">Usuarios de prueba:</h2>
                     <p>Usuario: moderador.rda | Contraseña: Choco.123</p>
-                    <p>Usuario: usuario.rda | Contraseña: Choco.123</p>
+                    <p>Usuario: alumno.rda | Contraseña: Choco.123</p>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
