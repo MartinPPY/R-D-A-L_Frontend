@@ -10,6 +10,7 @@ import { Eye, EyeOff, InfoIcon } from "lucide-react"
 import { getPermisos, login } from "@/services/authService"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useAuth } from "@/context/AuthContext"
+import { toast } from "sonner"
 
 interface FormValues {
     username: string
@@ -51,7 +52,7 @@ export const Login = () => {
 
         } catch (error: any) {
             console.error(error.response)
-            setError(error.response.data.detail || "Ha ocurrido un error. Verifica tus credenciales")
+            toast.error(error.response.data.detail || "Ha ocurrido un error. Verifica tus credenciales",{position:"top-center"})
 
         } finally {
             setLoading(false)
@@ -63,6 +64,13 @@ export const Login = () => {
         <main className="w-full h-screen flex items-center justify-center">
             <section className="w-full max-w-md p-6 space-y-8">
                 <h1 className="text-2xl font-bold text-center">Sistema de registro R-D-A-L</h1>
+
+                <div className="mb-4 mt-4 space-y-2 text-sm bg-muted p-3 rounded-lg" >
+                    <h2 className="text-lg font-semibold">Usuarios de prueba:</h2>
+                    <p>Usuario: moderador.rda | Contraseña: Choco.123</p>
+                    <p>Usuario: usuario.rda | Contraseña: Choco.123</p>
+                </div>
+
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Card>
                         <CardHeader>

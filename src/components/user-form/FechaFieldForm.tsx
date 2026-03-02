@@ -2,6 +2,7 @@ import { Controller, type Control, type FieldErrors } from "react-hook-form"
 import { Button, Calendar, Label, Popover, PopoverContent, PopoverTrigger } from "../ui"
 import { CalendarIcon } from "lucide-react"
 import type { FormValues } from "@/models"
+import { es } from "date-fns/locale";
 
 interface Props{
     control:Control<FormValues>;
@@ -37,7 +38,7 @@ export const FechaFieldForm = ({control, errors}:Props) => {
                                 mode="single"
                                 selected={field.value}
                                 onSelect={field.onChange}
-                                initialFocus
+                                locale={es}
                             />
                         </PopoverContent>
                     </Popover>
