@@ -2,7 +2,7 @@ import { diferenciaEntreHoras } from "@/helpers/activityHelper";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { ScrollArea } from "./ui/scroll-area";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
-import type { Activity } from "@/models/models";
+import type { Activity } from "@/models";
 
 export const UserTable = ({ actividades }: { actividades: Activity[] }) => {
     return (
