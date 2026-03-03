@@ -38,7 +38,7 @@ export const AdminCardSection = ({resumen}: {resumen: Resumen}) => {
     ]
 
     return (
-        <div className="grid grid-cols-1 gap-4 px-12 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 lg:px-12">
             {
                 menus.map((menu, index) => (
                     <Card key={index}>

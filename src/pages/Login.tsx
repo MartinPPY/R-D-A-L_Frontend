@@ -10,6 +10,7 @@ import { Eye, EyeOff, InfoIcon } from "lucide-react"
 import { getPermisos, login } from "@/services/authService"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { toast } from "sonner"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 interface FormValues {
     username: string
@@ -18,24 +19,13 @@ interface FormValues {
 
 export const Login = () => {
 
+    const queryClient = useQueryClient()
+    const mutation = useMutation({
+        mutationFn: (data: FormValues) => login(data.username, data.password),
+        onSuccess: async () => {
 
-    const [loading, setLoading] = useState(false)
-    const [showPassword, setShowPassword] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
-        defaultValues: {
-            username: "",
-            password: ""
-        }
-    })
-    const navigate = useNavigate()
-
-    const onSubmit = async (data: FormValues) => {
-        try {
-            setError(null)
-            setLoading(true)
-            await login(data.username, data.password)
+            queryClient.invalidateQueries({ queryKey: ["auth-user"] })
+            
             const response = await getPermisos()
 
             if (response.data.permisos[0][1] === "moderador") {
@@ -45,14 +35,26 @@ export const Login = () => {
             }
 
             reset()
-
-        } catch (error: any) {
-            console.error(error.response)
-            toast.error(error.response.data.detail || "Ha ocurrido un error. Verifica tus credenciales",{position:"top-center"})
-
-        } finally {
-            setLoading(false)
+        },
+        onError: (error) => {
+            console.error(error)
+            toast.error(error.message || "Ha ocurrido un error. Verifica tus credenciales", { position: "top-center" })
         }
+    })
+
+    const [showPassword, setShowPassword] = useState(false)
+
+    const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
+        defaultValues: {
+            username: "",
+            password: ""
+        }
+    })
+
+    const navigate = useNavigate()
+
+    const onSubmit = async (data: FormValues) => {
+        mutation.mutate(data)
     }
 
 
@@ -104,8 +106,8 @@ export const Login = () => {
                         </CardContent>
 
                         <CardFooter className="flex gap-2">
-                            <Button className="w-full" type="submit" disabled={loading}>
-                                {loading ? <><Spinner /> Cargando...</> : "Iniciar sesión"}
+                            <Button className="w-full" type="submit" disabled={mutation.isPending}>
+                                {mutation.isPending ? <><Spinner /> Cargando...</> : "Iniciar sesión"}
                             </Button>
                         </CardFooter>
                     </Card>
@@ -113,12 +115,12 @@ export const Login = () => {
                 </form>
 
                 {
-                    error !== null && (
+                    mutation.error !== null && (
                         <Alert variant="destructive">
                             <InfoIcon />
                             <AlertTitle>Ha ocurrido un error</AlertTitle>
                             <AlertDescription>
-                                {error}
+                                {mutation.error.message}
                             </AlertDescription>
                         </Alert>
                     )

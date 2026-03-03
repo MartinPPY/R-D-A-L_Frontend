@@ -11,7 +11,7 @@ interface Props {
 export const AdminActivityTable = ({ actividades }: Props) => {
 
     return (
-        <div className="px-12">
+        <div className="px-12 hidden lg:block">
             <Card>
                 <CardHeader>
                     <CardTitle>Actividades de usuarios </CardTitle>

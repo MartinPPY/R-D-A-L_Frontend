@@ -44,7 +44,7 @@ export const UserAppSidebar = ({menu,title}: {menu: Menu[], title: string}) => {
                         <SidebarMenuItem>
                             <SidebarMenuButton className="hover:bg-gray-100 font-medium" onClick={handleLogout}>
                                 <LogOut />
-                                Log out
+                                Cerrar Sesion
                             </SidebarMenuButton>
                         </SidebarMenuItem>
 

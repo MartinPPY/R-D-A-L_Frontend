@@ -48,8 +48,8 @@ export const AdminPagosData = ({ resumenPagos }: Props) => {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => crearOrdenCompra(resumen.user_id, resumen.monto_acumulado)}>
-              disabled={mutation.isPending}
+              onClick={() => crearOrdenCompra(resumen.user_id, resumen.monto_acumulado)}
+              disabled={mutation.isPending}>
               {mutation.isPending ? "Subiendo..." : "Subir orden de compra"}
             </Button>
           </TableCell>
