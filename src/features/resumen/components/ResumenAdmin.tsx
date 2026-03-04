@@ -1,40 +1,34 @@
-import { Clock, FileDigit, Users } from "lucide-react";
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
+import type { Resumen } from "@/models"
+import { useResumenAdmin } from "../hooks/useResumen"
+import { Clock, FileDigit, Users } from "lucide-react"
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui"
 
-interface Menu {
-    title: string;
-    value: string;
-    description: string;
-    icon: React.ReactNode;
-}
 
-interface Resumen{
-    usuarios: number;
-    cantidad_horas: number;
-    cantidad_orden_compra: number;
-}
+export const ResumenAdmin = () => {
+    const { data } = useResumenAdmin()
+    console.log(data)
 
-export const AdminCardSection = ({resumen}: {resumen: Resumen}) => {
-
-    const menus: Menu[] = [
+    const menus: Resumen[] = [
         {
             title: "Total de horas",
-            value: resumen.cantidad_horas.toString(),
+            value: data?.cantidad_horas.toString() || "0",
             description: "Del mes de " + new Date().toLocaleString('default', { month: 'long' }),
-            icon: <Clock size={16} />
+            icon: Clock
         },
         {
             title: "Alumnos",
-            value: resumen.usuarios.toString(),
+            value: data?.usuarios.toString() || "0",
             description: "Total de usuarios registrados",
-            icon: <Users size={16} />
+            icon: Users
         },
         {
             title: "Ordenes de compra",
-            value: resumen.cantidad_orden_compra.toString(),
+            value: data?.cantidad_orden_compra.toString() || "0",
             description: "Del mes de " + new Date().toLocaleString('default', { month: 'long' }),
-            icon: <FileDigit size={16} />
+            icon: FileDigit
         }
+
+
     ]
 
     return (
@@ -50,7 +44,7 @@ export const AdminCardSection = ({resumen}: {resumen: Resumen}) => {
                         </CardHeader>
                         <CardFooter className="flex-col items-start gap-1.5 text-sm">
                             <div className="line-clamp-1 flex gap-2 font-medium">
-                                {menu.description} {menu.icon}
+                                {menu.description} <menu.icon className="size-4" />
                             </div>
                         </CardFooter>
                     </Card>
@@ -59,4 +53,5 @@ export const AdminCardSection = ({resumen}: {resumen: Resumen}) => {
 
         </div>
     )
+
 }
