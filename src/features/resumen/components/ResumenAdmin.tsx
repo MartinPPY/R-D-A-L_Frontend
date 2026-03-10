@@ -6,7 +6,6 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/comp
 
 export const ResumenAdmin = () => {
     const { data } = useResumenAdmin()
-    console.log(data)
 
     const menus: Resumen[] = [
         {
@@ -32,7 +31,7 @@ export const ResumenAdmin = () => {
     ]
 
     return (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 lg:px-12">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 px-4 lg:px-12">
             {
                 menus.map((menu, index) => (
                     <Card key={index}>

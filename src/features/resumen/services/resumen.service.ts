@@ -8,7 +8,6 @@ export const resumenService = {
     },
     getResumenMensualAdmin: async (): Promise<ResumenAdmin> => {
         const { data } = await api.get("/v1/core/resumen-admin")
-        console.log(data)
         return data
     },
     getResumenPagoMensual: async (): Promise<ResumenPago> => {

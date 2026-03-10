@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, ScrollArea, Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui"
+import { Button, CardContent, ScrollArea, Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui"
 import type { Activity } from "@/models"
 import { ApproveButton } from "./ApproveButton"
 import { diferenciaEntreHoras } from "@/helpers"
@@ -27,16 +27,11 @@ const ActivityRow = ({ activity }: { activity: Activity }) => {
 
 export const ActivityTable = ({ activities }: Props) => {
     const {rol} = useAuth()
+    
     return (
-
-        <Card>
-            <CardHeader>
-                <CardTitle>{rol === "moderador" ? "Actividades de usuarios" : "Mis actividades"} </CardTitle>
-                <CardDescription>{rol === "moderador" ? "Registro de actividades de los usuarios" : "Registro de mis actividades"}</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ScrollArea className="w-full">
-                    <Table>
+        <CardContent className="p-0 border rounded-lg overflow-hidden bg-card">
+            <ScrollArea className="w-full">
+                <Table>
                         <TableRow>
                             <TableHead>Nombre</TableHead>
                             <TableHead>Area</TableHead>
@@ -51,8 +46,6 @@ export const ActivityTable = ({ activities }: Props) => {
                         </TableBody>
                     </Table>
                 </ScrollArea>
-            </CardContent>
-
-        </Card>
+        </CardContent>
     )
 }

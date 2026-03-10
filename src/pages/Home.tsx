@@ -17,9 +17,9 @@ export const Home = () => {
     {title:"Ver mis horas de trabajo",icon:<Clock />},*/
   ]
 
-  return (
+    return (
     <UserLayout menus={menus} title="R-D-A-L">
-      <div className="flex flex-col gap-20 p-4">
+      <div className="flex flex-col gap-8 md:gap-20 p-4">
         <ResumenMensual/>
         <UserFormSection />
         <Activity />

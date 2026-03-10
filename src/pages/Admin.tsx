@@ -1,4 +1,4 @@
-import { AdminPagosTable } from "@/components/AdminPagosTable";
+import { PagosTable } from "@/features/pagos/components/PagosTable";
 import { Activity } from "@/features/activities/components";
 import { ResumenMensual } from "@/features/resumen/components/ResumenMensual";
 import { UserLayout } from "@/layouts/UserLayout"
@@ -16,10 +16,10 @@ export const Admin = () => {
 
     return (
         <UserLayout menus={menus} title={title}>
-            <div className="flex flex-col gap-20 p-4">
+            <div className="flex flex-col gap-8 md:gap-20 p-4">
                 <ResumenMensual/>
                 <Activity/>                
-                <AdminPagosTable />
+                <PagosTable />
             </div>
         </UserLayout>
     )
